@@ -16,11 +16,11 @@ import chardet
 import logging
 from db import ConnectDB
 db=ConnectDB()
-log_dir="/tmp"
+log_dir="/tmp/spider.log"
 log_conf=logging.basicConfig(level=logging.INFO,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                 datefmt='%F %H:%M:%S',
-                filename='%s/spider.log' % log_dir,
+                filename='%s' % log_dir,
                 filemode='w')
 logger=logging.getLogger(__name__)
 url="http://www.autohome.com.cn/"
@@ -152,7 +152,8 @@ for type_name,url2 in url_1.items():
                                                 manufacturer=firm_name,
                                                 name=name_type_3,
                                                 price=price,
-                                                json_text=v)
+                                                json_text=v,
+                                                Url=sale_conf_url)
                                     db.dbclose()
                             else:
                                 mess= u"没有找到相关配置"
@@ -172,7 +173,8 @@ for type_name,url2 in url_1.items():
                             if filter_html:
                                 for item in filter_html:
                                     href=item.find('a',text='参数配置').get("href")
-                                    obj=GetObj(url+href)
+                                    stop_sale_conf_url_1=url+href
+                                    obj=GetObj(stop_sale_conf_url_1)
                                     conf=obj.getconf()
                                     if conf:
                                         #print conf
@@ -192,7 +194,8 @@ for type_name,url2 in url_1.items():
                                                 manufacturer=firm_name,
                                                 name=name_type_3,
                                                 price=price,
-                                                json_text=v)
+                                                json_text=v,
+                                                Url=stop_sale_conf_url_1 )
                                             db.dbclose()
                                             
                                         

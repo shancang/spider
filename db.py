@@ -16,7 +16,8 @@ class ConnectDB(object):
 					manufacturer="",
 					name="",
 					price="",
-					json_text=""
+					json_text="",
+					Url=""
 					):
 		sql='''insert into %s set 
 								spaceid=%s,
@@ -25,9 +26,10 @@ class ConnectDB(object):
 								manufacturer=\'%s\',
 								name=\'%s\',
 								price=\'%s\',
-								json_text=\'%s\'
+								json_text=\'%s\',
+								url = \'%s\'
 
-								''' % (table_name,spaceid,status,type_name,manufacturer,name,price,json_text)
+								''' % (table_name,spaceid,status,type_name,manufacturer,name,price,json_text,Url)
 		#print sql
 		#try:
 		self.cursor.execute(sql)
