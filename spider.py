@@ -8,13 +8,14 @@ import re
 import time
 import sys
 import os
+import json
 from bs4 import BeautifulSoup
 from daemonize import Daemonize
 import format_json
 import chardet
 import logging
-
-
+from db import ConnectDB
+db=ConnectDB()
 log_dir="/tmp"
 log_conf=logging.basicConfig(level=logging.INFO,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
@@ -136,12 +137,27 @@ for type_name,url2 in url_1.items():
                             obj=GetObj(sale_url)
                             conf=obj.getconf()
                             if conf:
-                                logging.info(log_mess)
                                 #print conf
+                                logging.info(log_mess)
+                                conf=json.loads(conf)
+
+                                for (k,v) in conf.items():
+                                    v=json.dumps(v,encoding='utf-8', ensure_ascii=False)
+                                    status="在售"
+                                    db=ConnectDB()
+                                    db.insert(table_name="json_data", 
+                                                spaceid=k,
+                                                status=status ,
+                                                type_name=type_name,
+                                                manufacturer=firm_name,
+                                                name=name_type_3,
+                                                price=price,
+                                                json_text=v)
+                                    db.dbclose()
                             else:
                                 mess= u"没有找到相关配置"
                                 logging.info("%s %s" % (log_mess,mess))
-                                    #print mess
+                                #print mess
                             #t=threading.Thread(target=get_josn)
                             #threads.append(t)
                         else:
@@ -159,16 +175,33 @@ for type_name,url2 in url_1.items():
                                     obj=GetObj(url+href)
                                     conf=obj.getconf()
                                     if conf:
+                                        #print conf
                                         logging.info("%s %s" % (log_mess,href))
                                         #print u"在售品牌中的停售车辆"
-                                        #print conf
+                                        conf=json.loads(conf)
+                                        for (k,v) in conf.items():
+                                            #print k,json.dumps(v,encoding='utf-8', ensure_ascii=False)
+                                            #db.insert(table_name=json, spaceid=k, json_data=v)
+                                            v=json.dumps(v,encoding='utf-8', ensure_ascii=False)
+                                            status="停售"
+                                            db=ConnectDB()
+                                            db.insert(table_name="json_data", 
+                                                spaceid=k,
+                                                status=status ,
+                                                type_name=type_name,
+                                                manufacturer=firm_name,
+                                                name=name_type_3,
+                                                price=price,
+                                                json_text=v)
+                                            db.dbclose()
+                                            
+                                        
                                     else:
                                         mess= u"没有找到相关配置"
                                         logging.info("%s %s" % (log_mess,href))
                                         #print mess
                             else:
                                 mess= u"没有找到相关配置"
-                                #print mess
                                 logging.info("%s %s" % (log_mess,mess))
     threads=[]                       
     t=threading.Thread(target=thrad,args=(type_name,url2))
