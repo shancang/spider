@@ -190,7 +190,6 @@ for type_name,url2 in url_1.items():
                                             status=status,
                                             URL_=sale_conf_url)
                                         
-                                        
                                     else:
                                         mess= u"没有找到相关配置"
                                         logging.info("%s %s" % (log_mess,mess))
@@ -233,13 +232,13 @@ for type_name,url2 in url_1.items():
                                     else:
                                         mess= u"没有找到相关配置"
                                         logging.info("%s %s" % (log_mess,mess))
-    thrad(type_name,url2)
-    #threads=[]                       
-    #t=threading.Thread(target=thrad,args=(type_name,url2))
-    #threads.append(t)
-    ##启动线程，并控制线程在50以内
-    #for t in threads:
-    #    t.start()
-    #    while True:
-    #        if(len(threading.enumerate()) < 12):
-    #            break
+
+    threads=[]                       
+    t=threading.Thread(target=thrad,args=(type_name,url2))
+    threads.append(t)
+    #启动线程，并控制线程在50以内
+    for t in threads:
+        t.start()
+        while True:
+            if(len(threading.enumerate()) < 12):
+                break
