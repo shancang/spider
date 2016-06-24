@@ -24,6 +24,8 @@ def format_json(a):
     data=json.dumps(comm_dic,indent=2 ,encoding='utf-8', ensure_ascii=False)
     return data
 
+    #return comm_dic
+
 
 
 

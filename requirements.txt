@@ -1,3 +1,4 @@
 chardet
 bs4
 mysql-python
+SQLAlchemy
