@@ -20,6 +20,8 @@ class ConnectDB(object):
                     structure	="",
                     status		="" ,
                     manufacturer="",
+                    year		="",
+                    index		="",
                     json_text	="",
                     URL_ 		=""
 					):
@@ -34,6 +36,8 @@ class ConnectDB(object):
                     structure	=\'%s\',
                     status		=\'%s\',
                     manufacturer=\'%s\',
+                    year		=\'%s\',
+                    font_letter	=\'%s\',
                     json_text	=\'%s\',
                     url 		=\'%s\'
 
@@ -48,6 +52,8 @@ class ConnectDB(object):
 									structure,
 									status,
 									manufacturer,
+									year,
+									index,
 									json_text,
 									URL_)
 		#print sql
@@ -56,11 +62,16 @@ class ConnectDB(object):
 		self.db.commit()
 		#except:
 		#	self.db.rollback()
+	def select(self,table_name="",field="",value=""):
+		sql=''' select %s from %s where %s = \'%s\' ''' % (field,table_name,field,value)
+		result=self.cursor.execute(sql)
+		return result
 		
 	def dbclose(self):
 		self.db.close()
 #db=ConnectDB()
 ##db.insert(table_name="json",spaceid=spaceid,json_data=json_data)
+#n=db.select(table_name="spider_json",field="series",value=u"凯尊")
 #db.dbclose()
 		
 
