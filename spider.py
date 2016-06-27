@@ -1,68 +1,23 @@
 # -*- coding: utf-8
-import cookielib
 import threading
-import urllib2
-import urllib
 import re
 import time
 import sys
 import json
-from bs4 import BeautifulSoup
-import format_json
-import chardet
 import logging
+from bs4 import BeautifulSoup
+from getobj import GetObj
 from db import ConnectDB
 db=ConnectDB()
-log_dir="/tmp/spider.log"
+log_dir="/tmp/spider1.log"
 log_conf=logging.basicConfig(level=logging.INFO,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                 datefmt='%F %H:%M:%S',
                 filename='%s' % log_dir,
                 filemode='w')
-logger=logging.getLogger(__name__)
+
+
 url="http://www.autohome.com.cn/"
-cookie_jar = cookielib.LWPCookieJar()
-cookie = urllib2.HTTPCookieProcessor(cookie_jar)
-opener = urllib2.build_opener(cookie)
-user_agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36"
-
-class GetObj(object):
-    def __init__(self,url):
-        self.url=url
-        self.send_headers={'User-Agent':user_agent}
-
-    def getcodeing(self,obj):
-        if obj:
-            coding=chardet.detect(obj)["encoding"]
-            return coding
-
-    def gethtml(self):
-        request = urllib2.Request(self.url,headers=self.send_headers)
-        try:
-            soures_home = opener.open(request).read()
-        except urllib2.URLError,e:
-            logging.warning(e)
-            return None
-        except urllib2.HTTPError,e:
-            logging.warning(e)
-            return None
-        return soures_home
-    def getconf(self):
-        #根据html结果获取配置项的json，并且格式化
-        html=self.gethtml()
-        coding=self.getcodeing(html)
-        if html is not None:
-            conf_html=html.decode(coding,"ignore").encode('utf-8')
-            w=re.compile(r'(var config =) ({.*})')
-            conf_josn=re.search(w,conf_html)
-            #print conf_josn
-            if hasattr(conf_josn,'group'):
-                conf_josn = conf_josn.group(2)
-                conf=format_json.format_json(conf_josn)
-                return conf
-            else:
-                return None
-        return None
 
 #获取费第一级分类URL
 def GetFirstType(url):
