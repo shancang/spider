@@ -4,17 +4,12 @@ import re
 import time
 import sys
 import json
-import logging
 from bs4 import BeautifulSoup
 from getobj import GetObj
 from db import ConnectDB
+from daemonize import Daemonize
+from common import *
 db=ConnectDB()
-log_dir="/tmp/spider1.log"
-log_conf=logging.basicConfig(level=logging.INFO,
-                format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
-                datefmt='%F %H:%M:%S',
-                filename='%s' % log_dir,
-                filemode='w')
 
 
 url="http://www.autohome.com.cn/"
@@ -63,7 +58,7 @@ def SaveData(table_name="",brand="",series="",conf="",status="",URL_="",index=""
         db=ConnectDB()
         n = db.select(table_name="spider_json",field="spaceid",value=spaceid)
         if n != 0:
-            logging.info("spaceid: %s exists " %  spaceid )
+            logger.info("spaceid: %s exists " %  spaceid )
             break
         db.insert(table_name=table_name, 
                     spaceid=spaceid,
@@ -85,7 +80,7 @@ def SaveData(table_name="",brand="",series="",conf="",status="",URL_="",index=""
 #停售处理函数        
 
 def thrad(type_name,url2):
-    logging.info("name：%s url: %s" % (type_name,url2))
+    logger.info("name：%s url: %s" % (type_name,url2))
     url2=url2.encode("utf-8")
     obj = GetObj(url2)
     html=obj.gethtml()
@@ -96,7 +91,7 @@ def thrad(type_name,url2):
     #print "----------------------------------------------"
     #print type_name
     #print "----------------------------------------------"
-    logging.info("start %s...." % type_name)
+    logger.info("start %s...." % type_name)
     content=soup.find("div",attrs={"class":["tab-content-item","current"]})
     soup=BeautifulSoup(str(content),'html5lib')
     index = soup.find_all('span',attrs={'class':"font-letter"})
@@ -117,8 +112,8 @@ def thrad(type_name,url2):
             for (manufacturer,ul_tag) in zip(manufacturer_name,ul):
                 #获取厂商名称
                 manufacturer=manufacturer.text
-                logging.info("start %s...." % manufacturer )
-                logging.debug(ul_tag)
+                logger.info("start %s...." % manufacturer )
+                logger.debug(ul_tag)
                 soup=BeautifulSoup(str(ul_tag),'html5lib')
                 w=re.compile(r's\d+')
                 litag=soup.find_all('li',id=w)
@@ -129,7 +124,7 @@ def thrad(type_name,url2):
                     n=db.select(table_name="spider_json",field="series",value=series)
                     db.dbclose()
                     if n != 0:
-                        logging.info("%s %s %s exists " % (type_name,brand, series) )
+                        logger.info("%s %s %s exists " % (type_name,brand, series) )
                         break
                     href=item.h4.a.get("href")
                     price=item.div.text
@@ -152,7 +147,7 @@ def thrad(type_name,url2):
                             conf=obj.getconf()
                             if conf:
                                 #print conf
-                                logging.info(log_mess)
+                                logger.info(log_mess)
                                 SaveData(table_name="spider_json",
                                     brand=brand,
                                     series=series,
@@ -163,7 +158,7 @@ def thrad(type_name,url2):
                                 
                             else:
                                 mess= u"没有找到相关配置"
-                                logging.info("%s %s" % (log_mess,mess))
+                                logger.info("%s %s" % (log_mess,mess))
                                 #print mess
                         else:
                 
@@ -184,7 +179,7 @@ def thrad(type_name,url2):
                                     conf=obj.getconf()
                                     if conf:
                                         #print conf
-                                        logging.info("%s %s" % (log_mess,href))
+                                        logger.info("%s %s" % (log_mess,href))
                                         SaveData(table_name="spider_json",
                                             brand=brand,
                                             series=series,
@@ -196,21 +191,21 @@ def thrad(type_name,url2):
                 
                                     else:
                                         mess= u"没有找到相关配置"
-                                        logging.info("%s %s %s" % (log_mess,mess,href))
+                                        logger.info("%s %s %s" % (log_mess,mess,href))
                                         #print mess
                             else:
                                 mess= u"没有找到相关配置"
-                                logging.info("%s %s" % (log_mess,mess))
-logging.info("start spider.....")
-url_1=GetFirstType(url)
-for type_name,url2 in url_1.items():
-    #thrad(type_name,url2)
-    #threads=[]                       
-    t=threading.Thread(target=thrad,args=(type_name,url2))
-    #threads.append(t)
-    #启动线程，并控制线程在50以内
-    #for t in threads:
-    t.start()
-    while True:
-        if(len(threading.enumerate()) < 12):
-            break
+                                logger.info("%s %s" % (log_mess,mess))
+
+def main():
+    logger.info("start spider.....")
+    url_1=GetFirstType(url)
+    for type_name,url2 in url_1.items():                     
+        t=threading.Thread(target=thrad,args=(type_name,url2))
+        t.start()
+        while True:
+            if(len(threading.enumerate()) < THARED_NUMBER + 1 ):
+                break
+
+daemon = Daemonize(app="app", pid=PID_FILE, action=main, keep_fds=keep_fds,logger=logger)
+daemon.start()

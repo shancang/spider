@@ -30,14 +30,6 @@ class FormatJson(object):
                     keys=conf["specid"]
                     v_name=conf["value"]
                     if option == "option":
-                        #if v_name == "-":
-                        #    v_name=u"无"
-                        #elif v_name == u"●":
-                        #    v_name=u"有"
-                        #else:
-                        #    f=re.compile(r'(.*)(\&nbsp\;\/\&nbsp\;)(.*)')
-                        #    p=re.search(f,v_name)
-                        #    if p:
                         v_name=v_name.replace('&nbsp;','')
                         v_name=v_name.replace(u'●',u'有')
                         v_name=v_name.replace(u'-',u'无')
