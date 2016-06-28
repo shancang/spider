@@ -1,4 +1,5 @@
 chardet
 bs4
 mysql-python
+daemonize
 SQLAlchemy
