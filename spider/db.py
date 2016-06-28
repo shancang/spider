@@ -1,13 +1,10 @@
 # -*- coding: utf-8
 import MySQLdb
-dbuser="spider"
-passwd="123456"
-host="localhost"
-port="3306"
-dbname="spider"
+from config import *
+
 class ConnectDB(object):
 	def __init__(self):
-		self.db=MySQLdb.connect(host,dbuser,passwd,dbname,charset="utf8")
+		self.db=MySQLdb.connect(DB_HOST,DB_USER,PASSWPRD,DB_NAME,charset="utf8")
 		self.cursor = self.db.cursor()
 	def insert(self,table_name	="", 
                     spaceid		="",
