@@ -4,8 +4,6 @@ import logging
 import os
 from config import *
 
-
-
 def set_log(level, filename='spider.log'):
     """
     return a log file object

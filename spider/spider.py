@@ -26,7 +26,7 @@ def GetFirstType(url):
     for item in content:
         name=item.a.text
         if name == u"电动车":
-            break
+            continue
         href=item.a.get("href")
         url1[name]=href
     return url1
@@ -39,7 +39,7 @@ def SaveData(table_name="",brand="",series="",conf="",status="",URL_="",index=""
         spaceid = k
         models = v[u"车型名称"]
         if models == '-':
-            break
+            continue
         mth=re.compile(r'(.*)(20\d\d)(.*)')
         y=re.search(mth,models)
         if y:
@@ -59,7 +59,7 @@ def SaveData(table_name="",brand="",series="",conf="",status="",URL_="",index=""
         n = db.select(table_name="spider_json",field="spaceid",value=spaceid)
         if n != 0:
             logger.info("spaceid: %s exists " %  spaceid )
-            break
+            continue
         db.insert(table_name=table_name, 
                     spaceid=spaceid,
                     brand=brand,
@@ -77,8 +77,8 @@ def SaveData(table_name="",brand="",series="",conf="",status="",URL_="",index=""
                     URL_=URL_)
         db.dbclose()
 
-#停售处理函数        
-
+    
+#线程函数
 def thrad(type_name,url2):
     logger.info("name：%s url: %s" % (type_name,url2))
     url2=url2.encode("utf-8")
@@ -125,7 +125,7 @@ def thrad(type_name,url2):
                     db.dbclose()
                     if n != 0:
                         logger.info("%s %s %s exists " % (type_name,brand, series) )
-                        break
+                        continue
                     href=item.h4.a.get("href")
                     price=item.div.text
                     url_id=href.split("/")[3]

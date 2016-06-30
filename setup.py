@@ -26,7 +26,7 @@ def stop():
 		f=open(PID_FILE,'r')
 		pid=f.read()
 		os.system("kill -9 %s" % pid)
-		os.system("rm -rf %s" % PID_FILE)
+		os.remove(PID_FILE)
 		print "Spider Stoped .... "
 		return 0
 	print "Spider Is Not Running  .... "
